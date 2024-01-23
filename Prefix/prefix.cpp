@@ -20,7 +20,9 @@ void prefix_mpi(int *block_array, int block_size, int *block_prefix, MPI_Comm co
     {
         block_sum += block_array[ind];
     }
+
     int previous_block_sum = 0;
+
 
     if (my_rank != 0)
     {
@@ -80,17 +82,21 @@ int main(int argc, char **args)
     MPI_Gather(block_prefix, block_size, MPI_INT,
                total_prefix, block_size, MPI_INT, 0, MPI_COMM_WORLD);
 
-    int accum = total_array[0];
+    int accum = 0;
     if (my_rank == 0)
     {
-        for (int i = 1; i < total_array_size; i++)
+        int num_of_errors = 0;
+        for (int i = 0; i < total_array_size; i++)
         {
-            cout << "total_prefix " << i << " " << total_prefix[i] << endl;
-            accum += total_array[i - 1];
+            // cout << "total_prefix  in i = " << i << ", equals =  " << total_prefix[i] << endl;
+            accum += total_array[i];
             if (total_prefix[i] != accum)
+            {
                 cout << "Error at index " << i << "  " << accum << " expected, " << total_prefix[i] << "computed\n";
+                num_of_errors++;
+            }
         }
-
+        cout << "number of errors = " << num_of_errors << " \n";
         cout << "Test completed!\n";
         free(total_array);
         free(total_prefix);

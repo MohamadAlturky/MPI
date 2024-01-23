@@ -108,7 +108,8 @@ int main(int argc, char **args)
     int max_value = 64;
     int *recv_array_tree = NULL;
     int *recv_array_sequential = NULL;
-
+    double reduce_tree_time;
+    double reduce_sequential_time;
     int my_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     if (my_rank == 0)
@@ -121,9 +122,20 @@ int main(int argc, char **args)
     for (int i = 0; i < count; i++)
         send_array[i] = my_rank;
 
+    // calling reduce functions
+    MPI_Barrier(MPI_COMM_WORLD);
+    if (my_rank == 0)
+    {
+        reduce_tree_time = MPI_Wtime();
+    }
     reduce_tree(send_array, recv_array_tree, count, MPI_COMM_WORLD);
+    if (my_rank == 0)
+    {
+        reduce_tree_time = MPI_Wtime() - reduce_tree_time;
+    }
     reduce_sequential(send_array, recv_array_sequential, count, MPI_COMM_WORLD);
 
+    //
     if (my_rank == 0)
     {
         for (int i = 0; i < count; i++)
