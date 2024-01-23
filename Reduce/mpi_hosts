@@ -1,0 +1,3 @@
+master
+slave1 user=mpiuser
+slave2 user=mpiuser
